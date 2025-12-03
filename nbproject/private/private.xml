@@ -2,28 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/MainApp.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/controller/MainController.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/model/Note.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/model/Category.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/model/Reminder.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/dao/DatabaseManager.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/dao/NoteDAO.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/service/NoteService.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/service/ReminderService.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/util/JsonExporter.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/util/CryptoUtil.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/view/NoteFormDialog.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/view/ReminderDialog.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/view/CategoryDialog.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/view/AboutDialog.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/view/components/NoteTablePanel.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/view/components/HeaderPanel.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/dao/CategoryDAO.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/dao/ReminderDAO.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/TestConnection.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/view/MainFrame.java</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>
