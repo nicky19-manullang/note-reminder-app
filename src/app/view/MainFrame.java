@@ -3,10 +3,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package app.view;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import app.model.Note;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 /**
  *
@@ -140,8 +147,49 @@ public class MainFrame extends JFrame {
     }
 
     private void exportNotes() {
-        JOptionPane.showMessageDialog(this, "Export belum dibuat. Nanti dibuat!");
+    JFileChooser chooser = new JFileChooser();
+    chooser.setDialogTitle("Save Notes as PDF");
+
+    int result = chooser.showSaveDialog(this);
+    if (result != JFileChooser.APPROVE_OPTION) return;
+
+    String filePath = chooser.getSelectedFile().getAbsolutePath();
+
+    if (!filePath.endsWith(".pdf")) {
+        filePath += ".pdf";
     }
+
+    try {
+        com.itextpdf.text.Document pdf = new com.itextpdf.text.Document();
+        com.itextpdf.text.pdf.PdfWriter.getInstance(pdf, new java.io.FileOutputStream(filePath));
+
+        pdf.open();
+        pdf.add(new com.itextpdf.text.Paragraph("Notes Export"));
+        pdf.add(new com.itextpdf.text.Paragraph("====================================\n\n"));
+
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            String id = String.valueOf(tableModel.getValueAt(i, 0));
+            String title = String.valueOf(tableModel.getValueAt(i, 1));
+            String content = String.valueOf(tableModel.getValueAt(i, 2));
+            String createdAt = String.valueOf(tableModel.getValueAt(i, 3));
+
+            pdf.add(new com.itextpdf.text.Paragraph(
+                    "ID: " + id + "\n" +
+                    "Title: " + title + "\n" +
+                    "Content: " + content + "\n" +
+                    "Created At: " + createdAt + "\n\n"
+            ));
+        }
+
+        pdf.close();
+
+        JOptionPane.showMessageDialog(this, "PDF berhasil disimpan:\n" + filePath);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Gagal export PDF!");
+    }
+}
 
     private void openAbout() {
         AboutDialog dialog = new AboutDialog(this);
