@@ -11,44 +11,53 @@ import java.awt.*;
  */
 public class AboutDialog extends JDialog {
 
-    public AboutDialog(Frame parent) {
-        super(parent, "About", true);
-        initComponents();
-        setSize(400, 250);
+    public AboutDialog(JFrame parent) {
+        super(parent, "About Application", true);
+        setSize(400, 260);
         setLocationRelativeTo(parent);
+        setResizable(false);
+
+        initUI();
     }
 
-    private void initComponents() {
-        setLayout(new BorderLayout());
+    private void initUI() {
+        setLayout(new BorderLayout(10,10));
 
-        // === Panel Title ===
-        JLabel lblTitle = new JLabel("NoteKeeper App", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
+        // ===== Judul =====
+        JLabel lblTitle = new JLabel("Note & Reminder App", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
 
-        add(lblTitle, BorderLayout.NORTH);
-
-        // === Panel Content ===
-        JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
-        textArea.setFont(new Font("Arial", Font.PLAIN, 14));
-        textArea.setText(
-                "Version: 1.0\n" +
-                "Developer: Nicky Rotin Suluh Manullang\n" +
-                "Created: 2024\n\n" +
-                "NoteKeeper adalah aplikasi desktop sederhana untuk mencatat,\n" +
-                "mengelola kategori, dan mengatur pengingat.\n"
+        // ===== Konten =====
+        JTextArea txtAbout = new JTextArea();
+        txtAbout.setEditable(false);
+        txtAbout.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtAbout.setText(
+                "Aplikasi sederhana untuk mencatat dan mengatur reminder.\n\n" +
+                "Fitur:\n" +
+                "• Tambah catatan\n" +
+                "• Reminder dengan tanggal dan waktu\n" +
+                "• Export catatan ke PDF\n" +
+                "• About dialog\n\n" +
+                "Developed by:\n" +
+                "Kelompok 2 (PBO Mafufu) \n" +
+                "(2025)"
         );
-        textArea.setBackground(new Color(240, 240, 240));
-        textArea.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
-        add(textArea, BorderLayout.CENTER);
+        txtAbout.setBackground(getBackground());
 
-        // === Button Panel ===
-        JPanel buttonPanel = new JPanel();
-        JButton btnClose = new JButton("Close");
-        btnClose.addActionListener(e -> setVisible(false));
+        JScrollPane scroll = new JScrollPane(txtAbout);
+        scroll.setBorder(null);
 
-        buttonPanel.add(btnClose);
-        add(buttonPanel, BorderLayout.SOUTH);
+        // ===== BUTTON =====
+        JButton btnOk = new JButton("OK");
+        btnOk.addActionListener(e -> dispose());
+
+        JPanel btnPanel = new JPanel();
+        btnPanel.add(btnOk);
+
+        // ===== Menambahkan =====
+        add(lblTitle, BorderLayout.NORTH);
+        add(scroll, BorderLayout.CENTER);
+        add(btnPanel, BorderLayout.SOUTH);
     }
 }

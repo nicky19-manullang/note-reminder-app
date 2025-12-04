@@ -4,9 +4,13 @@
  */
 package app.view;
 import app.model.Note;
+import app.model.Category;
+import app.dao.CategoryDAO;
+
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
+import java.util.List;
 /**
  *
  * @author admin
@@ -15,34 +19,39 @@ public class NoteFormDialog extends JDialog {
 
     private JTextField txtTitle;
     private JTextArea txtContent;
+    private JComboBox<Category> cbCategory;
     private JButton btnSave, btnCancel;
 
-    private Note note;         // null = mode tambah
+    private Note note;         
     private boolean saved = false;
 
     public NoteFormDialog(Frame parent) {
         super(parent, true);
-        setTitle("Add / Edit Note");
+        setTitle("Add Note");
         setSize(450, 350);
         setLocationRelativeTo(parent);
         initUI();
+        loadCategories();
     }
 
     public NoteFormDialog(Frame parent, Note existingNote) {
         super(parent, true);
-        this.note = existingNote;   // mode edit
+        this.note = existingNote;
         setTitle("Edit Note");
         setSize(450, 350);
         setLocationRelativeTo(parent);
         initUI();
+        loadCategories();
         loadData();
     }
 
     private void initUI() {
 
-        // ========== INPUT COMPONENTS ==========
         JLabel lblTitle = new JLabel("Title:");
         txtTitle = new JTextField();
+
+        JLabel lblCategory = new JLabel("Category:");
+        cbCategory = new JComboBox<>();
 
         JLabel lblContent = new JLabel("Content:");
         txtContent = new JTextArea(8, 20);
@@ -50,7 +59,6 @@ public class NoteFormDialog extends JDialog {
         txtContent.setWrapStyleWord(true);
         JScrollPane scrollContent = new JScrollPane(txtContent);
 
-        // ========== BUTTONS ==========
         btnSave = new JButton("Save");
         btnCancel = new JButton("Cancel");
 
@@ -58,11 +66,11 @@ public class NoteFormDialog extends JDialog {
         btnPanel.add(btnSave);
         btnPanel.add(btnCancel);
 
-        // ========== LAYOUT PANEL ==========
         JPanel form = new JPanel(new GridBagLayout());
         GridBagConstraints gc = new GridBagConstraints();
         gc.insets = new Insets(5, 5, 5, 5);
         gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.weightx = 1;
 
         gc.gridx = 0; gc.gridy = 0;
         form.add(lblTitle, gc);
@@ -71,24 +79,48 @@ public class NoteFormDialog extends JDialog {
         form.add(txtTitle, gc);
 
         gc.gridx = 0; gc.gridy = 1;
-        form.add(lblContent, gc);
+        form.add(lblCategory, gc);
 
         gc.gridx = 1; gc.gridy = 1;
+        form.add(cbCategory, gc);
+
+        gc.gridx = 0; gc.gridy = 2;
+        form.add(lblContent, gc);
+
+        gc.gridx = 1; gc.gridy = 2;
         form.add(scrollContent, gc);
 
         setLayout(new BorderLayout());
         add(form, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // ========== EVENTS ==========
         btnSave.addActionListener(e -> saveNote());
         btnCancel.addActionListener(e -> dispose());
+    }
+
+    private void loadCategories() {
+        CategoryDAO dao = new CategoryDAO();
+        List<Category> categories = dao.getAll();
+
+        cbCategory.removeAllItems(); // penting
+
+        for(Category c : categories) {
+            cbCategory.addItem(c);
+        }
     }
 
     private void loadData() {
         if (note != null) {
             txtTitle.setText(note.getTitle());
             txtContent.setText(note.getContent());
+
+            for(int i = 0; i < cbCategory.getItemCount(); i++){
+                Category c = cbCategory.getItemAt(i);
+                if(c.getId() == note.getCategoryId()){
+                    cbCategory.setSelectedIndex(i);
+                    break;
+                }
+            }
         }
     }
 
@@ -107,7 +139,6 @@ public class NoteFormDialog extends JDialog {
         }
 
         if (note == null) {
-            // mode tambah
             note = new Note();
             note.setCreatedAt(LocalDateTime.now());
         }
@@ -115,11 +146,15 @@ public class NoteFormDialog extends JDialog {
         note.setTitle(title);
         note.setContent(content);
 
+        Category selected = (Category) cbCategory.getSelectedItem();
+        if(selected != null){
+            note.setCategoryId(selected.getId());
+        }
+
         saved = true;
         dispose();
     }
 
-    // ========== GETTER UNTUK MAIN FRAME ==========
     public boolean isSaved() {
         return saved;
     }

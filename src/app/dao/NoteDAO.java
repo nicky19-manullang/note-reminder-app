@@ -6,7 +6,6 @@ package app.dao;
 
 import app.model.Note;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -15,109 +14,105 @@ import java.util.List;
  */
 public class NoteDAO {
 
-    // Membuat tabel jika belum ada
-    public void createTable() {
-        String sql = """
-            CREATE TABLE IF NOT EXISTS notes (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                content TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        """;
+    public List<Note> getAll() {
+        List<Note> list = new ArrayList<>();
 
-        try (Connection conn = DatabaseManager.getConnection();
-             Statement stmt = conn.createStatement()) {
+        String sql = "SELECT * FROM notes ORDER BY created_at DESC";
 
-            stmt.execute(sql);
-            System.out.println("Tabel notes berhasil dibuat atau sudah ada!");
-        } catch (SQLException e) {
+        try(Connection conn = DatabaseManager.getConnection();
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(sql)) {
+
+            while(rs.next()) {
+                Note n = new Note(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("content"),
+                        rs.getTimestamp("created_at").toLocalDateTime(),
+                        rs.getInt("category_id")
+                );
+                list.add(n);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
+        return list;
     }
 
-    // ============================================
-    // INSERT
-    // ============================================
+    public Note getById(int id) {
+        String sql = "SELECT * FROM notes WHERE id = ?";
+        Note note = null;
+
+        try(Connection conn = DatabaseManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()) {
+                note = new Note(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("content"),
+                        rs.getTimestamp("created_at").toLocalDateTime(),
+                        rs.getInt("category_id")
+                );
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return note;
+    }
+
     public void insert(Note note) {
-        String sql = "INSERT INTO notes (title, content) VALUES (?, ?)";
+        String sql = "INSERT INTO notes(title, content, created_at, category_id) VALUES (?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try(Connection conn = DatabaseManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, note.getTitle());
             ps.setString(2, note.getContent());
+            ps.setTimestamp(3, Timestamp.valueOf(note.getCreatedAt()));
+            ps.setInt(4, note.getCategoryId());
+
             ps.executeUpdate();
 
-            System.out.println("Data berhasil ditambahkan!");
-        } catch (SQLException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
     }
 
-    // ============================================
-    // UPDATE
-    // ============================================
     public void update(Note note) {
-        String sql = "UPDATE notes SET title = ?, content = ? WHERE id = ?";
+        String sql = "UPDATE notes SET title = ?, content = ?, category_id = ? WHERE id = ?";
 
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try(Connection conn = DatabaseManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, note.getTitle());
             ps.setString(2, note.getContent());
-            ps.setInt(3, note.getId());
+            ps.setInt(3, note.getCategoryId());
+            ps.setInt(4, note.getId());
+
             ps.executeUpdate();
 
-            System.out.println("Data berhasil diperbarui!");
-        } catch (SQLException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
     }
 
-    // ============================================
-    // DELETE
-    // ============================================
     public void delete(int id) {
         String sql = "DELETE FROM notes WHERE id = ?";
 
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try(Connection conn = DatabaseManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ps.executeUpdate();
 
-            System.out.println("Data berhasil dihapus!");
-        } catch (SQLException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
-    }
-
-    // ============================================
-    // GET ALL NOTES
-    // ============================================
-    public List<Note> getAllNotes() {
-        List<Note> notes = new ArrayList<>();
-        String sql = "SELECT * FROM notes ORDER BY created_at DESC";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                Note note = new Note();
-                note.setId(rs.getInt("id"));
-                note.setTitle(rs.getString("title"));
-                note.setContent(rs.getString("content"));
-                note.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-
-                notes.add(note);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return notes;
     }
 }
