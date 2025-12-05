@@ -3,9 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package app.view;
+import app.dao.CategoryDAO;
 import app.model.Note;
 import app.model.Category;
-import app.dao.CategoryDAO;
+import app.service.CategoryService;
 
 import javax.swing.*;
 import java.awt.*;

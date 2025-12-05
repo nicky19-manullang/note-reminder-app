@@ -15,61 +15,38 @@ public class ReminderDAO {
 
     public List<Reminder> getAll() {
         List<Reminder> list = new ArrayList<>();
-        String sql = "SELECT * FROM reminders ORDER BY id DESC";
+        String sql = "SELECT * FROM reminders ORDER BY remind_at ASC";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Reminder r = new Reminder();
-                r.setId(rs.getInt("id"));
-                r.setNoteId(rs.getInt("note_id"));
-                r.setReminderDate(rs.getTimestamp("reminder_date"));
-                r.setCreatedAt(rs.getTimestamp("created_at"));
+                Reminder r = new Reminder(
+                        rs.getInt("id"),
+                        rs.getInt("note_id"),
+                        rs.getTimestamp("remind_at").toLocalDateTime(),
+                        rs.getString("status")
+                );
                 list.add(r);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return list;
     }
 
-    public Reminder getById(int id) {
-        Reminder r = null;
-        String sql = "SELECT * FROM reminders WHERE id=?";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                r = new Reminder();
-                r.setId(rs.getInt("id"));
-                r.setNoteId(rs.getInt("note_id"));
-                r.setReminderDate(rs.getTimestamp("reminder_date"));
-                r.setCreatedAt(rs.getTimestamp("created_at"));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return r;
-    }
-
     public boolean insert(Reminder r) {
-        String sql = "INSERT INTO reminders(note_id, reminder_date, created_at) VALUES(?, ?, NOW())";
+        String sql = "INSERT INTO reminders(note_id, remind_at, status) VALUES(?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, r.getNoteId());
-            ps.setTimestamp(2, r.getReminderDate());
+            ps.setTimestamp(2, Timestamp.valueOf(r.getRemindAt()));
+            ps.setString(3, r.getStatus());
+
             return ps.executeUpdate() > 0;
 
         } catch (Exception e) {
@@ -79,14 +56,16 @@ public class ReminderDAO {
     }
 
     public boolean update(Reminder r) {
-        String sql = "UPDATE reminders SET note_id=?, reminder_date=? WHERE id=?";
+        String sql = "UPDATE reminders SET note_id=?, remind_at=?, status=? WHERE id=?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, r.getNoteId());
-            ps.setTimestamp(2, r.getReminderDate());
-            ps.setInt(3, r.getId());
+            ps.setTimestamp(2, Timestamp.valueOf(r.getRemindAt()));
+            ps.setString(3, r.getStatus());
+            ps.setInt(4, r.getId());
+
             return ps.executeUpdate() > 0;
 
         } catch (Exception e) {

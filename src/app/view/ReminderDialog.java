@@ -12,46 +12,32 @@ import java.time.LocalDateTime;
  */
 public class ReminderDialog extends JDialog {
 
-    private JTextField txtTitle;
-    private JTextArea txtMessage;
     private JSpinner dateSpinner;
     private boolean saved = false;
 
     public ReminderDialog(JFrame parent) {
         super(parent, "Set Reminder", true);
-        setSize(400, 350);
+        setSize(350, 200);
         setLocationRelativeTo(parent);
-
         initUI();
     }
 
     private void initUI() {
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(10, 10));
 
-        // Panel input
-        JPanel formPanel = new JPanel(new GridLayout(3, 1, 10, 10));
+        JPanel formPanel = new JPanel(new GridLayout(1, 1, 10, 10));
 
-        txtTitle = new JTextField();
-
-        txtMessage = new JTextArea(5, 20);
-        txtMessage.setLineWrap(true);
-        txtMessage.setWrapStyleWord(true);
-
-        dateSpinner = new JSpinner(
-                new SpinnerDateModel()
-        );
+        // Date-time spinner
+        dateSpinner = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor editor = new JSpinner.DateEditor(dateSpinner, "yyyy-MM-dd HH:mm");
         dateSpinner.setEditor(editor);
 
-        formPanel.add(labeled("Reminder Title", txtTitle));
-        formPanel.add(labeled("Message", new JScrollPane(txtMessage)));
-        formPanel.add(labeled("Date & Time", dateSpinner));
-
+        formPanel.add(labeled("Reminder Date & Time", dateSpinner));
         add(formPanel, BorderLayout.CENTER);
 
         // Buttons
         JPanel buttonPanel = new JPanel();
-        JButton btnSave = new JButton("Save");
+        JButton btnSave = new JButton("Save Reminder");
         JButton btnCancel = new JButton("Cancel");
 
         buttonPanel.add(btnSave);
@@ -76,14 +62,6 @@ public class ReminderDialog extends JDialog {
 
     public boolean isSaved() {
         return saved;
-    }
-
-    public String getTitleText() {
-        return txtTitle.getText();
-    }
-
-    public String getMessageText() {
-        return txtMessage.getText();
     }
 
     public LocalDateTime getDateTime() {

@@ -6,7 +6,6 @@ package app.dao;
 
 import app.model.Note;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -67,7 +66,8 @@ public class NoteDAO {
         return note;
     }
 
-    public void insert(Note note) {
+    // Return ID baru
+    public int insert(Note note) {
         String sql = "INSERT INTO notes (title, content, created_at, category_id) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -80,18 +80,22 @@ public class NoteDAO {
 
             ps.executeUpdate();
 
-            // ambil id baru dari MySQL
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
-                note.setId(rs.getInt(1));
+                int newId = rs.getInt(1);
+                note.setId(newId);
+                return newId;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return -1; // gagal
     }
 
-    public void update(Note note) {
+    // Return true jika update berhasil
+    public boolean update(Note note) {
         String sql = "UPDATE notes SET title = ?, content = ?, category_id = ? WHERE id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -102,24 +106,29 @@ public class NoteDAO {
             ps.setInt(3, note.getCategoryId());
             ps.setInt(4, note.getId());
 
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return false;
     }
 
-    public void delete(int id) {
+    // Return true jika delete berhasil
+    public boolean delete(int id) {
         String sql = "DELETE FROM notes WHERE id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return false;
     }
 }

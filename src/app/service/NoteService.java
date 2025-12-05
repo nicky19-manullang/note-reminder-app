@@ -18,11 +18,18 @@ public class NoteService {
         return dao.getAll();
     }
 
-    public void addNote(Note note) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    // INSERT note dan RETURN ID
+    public int addNote(Note note) {
+        return dao.insert(note);  
     }
 
-    public void delete(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    // UPDATE note dan return true/false
+    public boolean updateNote(Note note) {
+        return dao.update(note);
+    }
+
+    // DELETE note berdasarkan ID
+    public boolean deleteNote(int id) {
+        return dao.delete(id);
     }
 }

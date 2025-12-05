@@ -3,16 +3,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package app.service;
-import app.dao.NoteDAO;
 import app.dao.ReminderDAO;
-import app.model.Note;
 import app.model.Reminder;
 import java.util.List;
+
 /**
  *
  * @author admin
  */
 public class ReminderService {
+
     private ReminderDAO reminderDAO = new ReminderDAO();
 
     public List<Reminder> getAll() {
@@ -31,4 +31,3 @@ public class ReminderService {
         return reminderDAO.delete(id);
     }
 }
-

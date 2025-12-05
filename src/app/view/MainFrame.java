@@ -96,16 +96,24 @@ public class MainFrame extends JFrame {
     }
 
     private void openAddForm() {
+
     NoteFormDialog dialog = new NoteFormDialog(this);
     dialog.setVisible(true);
 
     if (dialog.isSaved()) {
+
         Note note = dialog.getNote();
+
+        NoteService service = new NoteService();
+        int generatedId = service.addNote(note);  
+        note.setId(generatedId);
+
         noteList.add(note);
+
         tableModel.addRow(new Object[]{
                 note.getId(),
                 note.getTitle(),
-                note.getCategory(),   
+                note.getCategory() != null ? note.getCategory().getName() : "-",
                 note.getContent(),
                 note.getCreatedAt()
         });
@@ -120,45 +128,91 @@ public class MainFrame extends JFrame {
         return;
     }
 
+    // Ambil note dari list
     Note note = noteList.get(row);
+
+    // Buka dialog edit
     NoteFormDialog dialog = new NoteFormDialog(this, note);
     dialog.setVisible(true);
 
     if (dialog.isSaved()) {
-        tableModel.setValueAt(note.getTitle(), row, 1);
-        tableModel.setValueAt(note.getCategory(), row, 2); 
-        tableModel.setValueAt(note.getContent(), row, 3);
-    }
-}
 
+        // Simpan perubahan ke database
+        NoteService service = new NoteService();
+        boolean success = service.updateNote(note);
 
-    private void deleteNote() {
-        int row = tblNotes.getSelectedRow();
-        if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Pilih catatan!");
+        if (!success) {
+            JOptionPane.showMessageDialog(this, "Gagal mengupdate note!");
             return;
         }
 
-        noteList.remove(row);
-        tableModel.removeRow(row);
+        // Update table UI
+        tableModel.setValueAt(note.getTitle(), row, 1);
+        tableModel.setValueAt(
+            note.getCategory() != null ? note.getCategory().getName() : "-",
+            row, 
+            2
+        );
+        tableModel.setValueAt(note.getContent(), row, 3);
+
+        JOptionPane.showMessageDialog(this, "Note berhasil diupdate!");
     }
+}
+
+private void deleteNote() {
+    int row = tblNotes.getSelectedRow();
+    if (row == -1) {
+        JOptionPane.showMessageDialog(this, "Pilih catatan yang ingin dihapus!");
+        return;
+    }
+
+    Note note = noteList.get(row);
+
+    int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Yakin ingin menghapus note ini?",
+            "Konfirmasi",
+            JOptionPane.YES_NO_OPTION
+    );
+
+    if (confirm != JOptionPane.YES_OPTION) return;
+
+    // Delete ke database
+    NoteService service = new NoteService();
+    boolean success = service.deleteNote(note.getId());
+
+    if (!success) {
+        JOptionPane.showMessageDialog(this, "Gagal menghapus note dari database!");
+        return;
+    }
+
+    // Hapus dari program
+    noteList.remove(row);
+    tableModel.removeRow(row);
+
+    JOptionPane.showMessageDialog(this, "Note berhasil dihapus!");
+}
 
 private void openReminder() {
     ReminderDialog dialog = new ReminderDialog(this);
     dialog.setVisible(true);
 
-    if (dialog.isSaved()) {
-        String title = dialog.getTitleText();
-        String msg = dialog.getMessageText();
-        LocalDateTime time = dialog.getDateTime();
+    if (!dialog.isSaved()) return;
 
-        JOptionPane.showMessageDialog(
-                this,
-                "Reminder Saved:\n" +
-                        title + "\n" +
-                        msg + "\n" +
-                        time
-        );
+    LocalDateTime time = dialog.getDateTime();
+    int noteId = getSelectedNoteId(); // ambil ID note yang dipilih
+
+    Reminder r = new Reminder();
+    r.setNoteId(noteId);
+    r.setReminderTime(time);
+    r.setNotified(false);
+
+    boolean saved = reminderService.insert(r);
+
+    if (saved) {
+        JOptionPane.showMessageDialog(this, "Reminder saved to database!");
+    } else {
+        JOptionPane.showMessageDialog(this, "Failed to save reminder.");
     }
 }
 

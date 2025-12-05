@@ -15,59 +15,23 @@ public class Reminder {
     private int id;
     private int noteId;
     private LocalDateTime reminderTime;
+    private LocalDateTime createdAt;
     private boolean notified;
 
     public Reminder() {}
 
-    public Reminder(int id, int noteId, LocalDateTime reminderTime, boolean notified) {
-        this.id = id;
-        this.noteId = noteId;
-        this.reminderTime = reminderTime;
-        this.notified = notified;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    // Getter Setter
-    public int getId() {
-        return id;
-    }
+    public int getNoteId() { return noteId; }
+    public void setNoteId(int noteId) { this.noteId = noteId; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public LocalDateTime getReminderTime() { return reminderTime; }
+    public void setReminderTime(LocalDateTime reminderTime) { this.reminderTime = reminderTime; }
 
-    public int getNoteId() {
-        return noteId;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setNoteId(int noteId) {
-        this.noteId = noteId;
-    }
-
-    public LocalDateTime getReminderTime() {
-        return reminderTime;
-    }
-
-    public void setReminderTime(LocalDateTime reminderTime) {
-        this.reminderTime = reminderTime;
-    }
-
-    public boolean isNotified() {
-        return notified;
-    }
-
-    public void setNotified(boolean notified) {
-        this.notified = notified;
-    }
-
-    public void setReminderDate(Timestamp timestamp) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void setCreatedAt(Timestamp timestamp) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public Timestamp getReminderDate() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    public boolean isNotified() { return notified; }
+    public void setNotified(boolean notified) { this.notified = notified; }
 }
