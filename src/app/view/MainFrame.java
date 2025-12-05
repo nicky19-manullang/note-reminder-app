@@ -3,10 +3,24 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package app.view;
+import java.io.FileOutputStream;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Font;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import app.model.Note;
+import app.service.NoteService;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 /**
  *
@@ -14,18 +28,13 @@ import java.util.logging.Logger;
  */
 public class MainFrame extends JFrame {
 
-    private static final Logger logger = Logger.getLogger(MainFrame.class.getName());
-
-    // UI Components
     private JTable tblNotes;
-    private JButton btnAdd, btnEdit, btnDelete, btnReminder;
-    private JMenuItem menuExport, menuExit, menuAbout;
-
     private DefaultTableModel tableModel;
+    private java.util.List<Note> noteList = new java.util.ArrayList<>();
 
     public MainFrame() {
-        setTitle("Note & Reminder App");
-        setSize(700, 450);
+        setTitle("Note Reminder App");
+        setSize(750, 450);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -33,40 +42,36 @@ public class MainFrame extends JFrame {
     }
 
     private void initUI() {
-
-        // =============== TABLE ===============
         tableModel = new DefaultTableModel(
-                new Object[]{"ID", "Title", "Content", "Created At"}, 0
+                new Object[]{"ID", "Title", "Category", "Content", "Created At"}, 0
         );
-
         tblNotes = new JTable(tableModel);
+        loadNotesFromDatabase();
         JScrollPane scrollPane = new JScrollPane(tblNotes);
 
-        // =============== BUTTONS ===============
-        btnAdd = new JButton("Add Note");
-        btnEdit = new JButton("Edit Note");
-        btnDelete = new JButton("Delete Note");
-        btnReminder = new JButton("Reminder");
+        // Buttons
+        JButton btnAdd = new JButton("Add");
+        JButton btnEdit = new JButton("Edit");
+        JButton btnDelete = new JButton("Delete");
+        JButton btnReminder = new JButton("Reminder");
 
-        JPanel btnPanel = new JPanel();
-        btnPanel.add(btnAdd);
-        btnPanel.add(btnEdit);
-        btnPanel.add(btnDelete);
-        btnPanel.add(btnReminder);
+        JPanel panel = new JPanel();
+        panel.add(btnAdd);
+        panel.add(btnEdit);
+        panel.add(btnDelete);
+        panel.add(btnReminder);
 
-        // =============== MENU BAR ===============
+        // Menu
         JMenuBar menuBar = new JMenuBar();
-
         JMenu menuFile = new JMenu("File");
-        menuExport = new JMenuItem("Export Notes");
-        menuExit = new JMenuItem("Exit");
+        JMenuItem menuExport = new JMenuItem("Export PDF");
+        JMenuItem menuExit = new JMenuItem("Exit");
 
         menuFile.add(menuExport);
         menuFile.add(menuExit);
 
         JMenu menuHelp = new JMenu("Help");
-        menuAbout = new JMenuItem("About");
-
+        JMenuItem menuAbout = new JMenuItem("About");
         menuHelp.add(menuAbout);
 
         menuBar.add(menuFile);
@@ -74,82 +79,189 @@ public class MainFrame extends JFrame {
 
         setJMenuBar(menuBar);
 
-        // =============== LAYOUT ===============
+        // LAYOUT
         setLayout(new BorderLayout());
         add(scrollPane, BorderLayout.CENTER);
-        add(btnPanel, BorderLayout.SOUTH);
+        add(panel, BorderLayout.SOUTH);
 
-        // =============== EVENT ===============
+        // Actions
         btnAdd.addActionListener(e -> openAddForm());
         btnEdit.addActionListener(e -> openEditForm());
         btnDelete.addActionListener(e -> deleteNote());
         btnReminder.addActionListener(e -> openReminder());
-        menuExport.addActionListener(e -> exportNotes());
-        menuExit.addActionListener(e -> System.exit(0));
+        menuExport.addActionListener(e -> exportPDF());
         menuAbout.addActionListener(e -> openAbout());
+        menuExit.addActionListener(e -> System.exit(0));
     }
-
-    // =================== EVENT METHODS ===================
 
     private void openAddForm() {
-        NoteFormDialog dialog = new NoteFormDialog(this);
-        dialog.setVisible(true);
+    NoteFormDialog dialog = new NoteFormDialog(this);
+    dialog.setVisible(true);
 
-        if (dialog.isSaved()) {
-            Note n = dialog.getNote();
-            tableModel.addRow(new Object[]{
-                    n.getId(),
-                    n.getTitle(),
-                    n.getContent(),
-                    n.getCreatedAt()
-            });
-        }
+    if (dialog.isSaved()) {
+        Note note = dialog.getNote();
+        noteList.add(note);
+        tableModel.addRow(new Object[]{
+                note.getId(),
+                note.getTitle(),
+                note.getCategory(),   
+                note.getContent(),
+                note.getCreatedAt()
+        });
     }
+}
+
 
     private void openEditForm() {
-        int row = tblNotes.getSelectedRow();
-        if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Pilih catatan dulu!");
-            return;
-        }
-        // Nanti dilanjut saat NoteFormDialog sudah ada
+    int row = tblNotes.getSelectedRow();
+    if (row == -1) {
+        JOptionPane.showMessageDialog(this, "Pilih catatan yang ingin diedit!");
+        return;
     }
+
+    Note note = noteList.get(row);
+    NoteFormDialog dialog = new NoteFormDialog(this, note);
+    dialog.setVisible(true);
+
+    if (dialog.isSaved()) {
+        tableModel.setValueAt(note.getTitle(), row, 1);
+        tableModel.setValueAt(note.getCategory(), row, 2); 
+        tableModel.setValueAt(note.getContent(), row, 3);
+    }
+}
+
 
     private void deleteNote() {
         int row = tblNotes.getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Pilih catatan yang mau dihapus!");
+            JOptionPane.showMessageDialog(this, "Pilih catatan!");
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(
+        noteList.remove(row);
+        tableModel.removeRow(row);
+    }
+
+private void openReminder() {
+    ReminderDialog dialog = new ReminderDialog(this);
+    dialog.setVisible(true);
+
+    if (dialog.isSaved()) {
+        String title = dialog.getTitleText();
+        String msg = dialog.getMessageText();
+        LocalDateTime time = dialog.getDateTime();
+
+        JOptionPane.showMessageDialog(
                 this,
-                "Hapus catatan ini?",
-                "Konfirmasi",
-                JOptionPane.YES_NO_OPTION
+                "Reminder Saved:\n" +
+                        title + "\n" +
+                        msg + "\n" +
+                        time
         );
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            tableModel.removeRow(row);
-        }
     }
-
-    private void openReminder() {
-        ReminderDialog dialog = new ReminderDialog(this);
-        dialog.setVisible(true);
-    }
-
-    private void exportNotes() {
-        JOptionPane.showMessageDialog(this, "Export belum dibuat. Nanti dibuat!");
-    }
+}
 
     private void openAbout() {
-        AboutDialog dialog = new AboutDialog(this);
-        dialog.setVisible(true);
+        new AboutDialog(this).setVisible(true);
     }
 
-    // RUN APP
+private void exportPDF() {
+
+    JFileChooser chooser = new JFileChooser();
+    chooser.setDialogTitle("Save Notes PDF");
+
+    if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+    String path = chooser.getSelectedFile().getAbsolutePath();
+    if (!path.endsWith(".pdf")) path += ".pdf";
+
+    try {
+        Document pdf = new Document();
+        PdfWriter.getInstance(pdf, new FileOutputStream(path));
+        pdf.open();
+
+        // Title PDF
+        Paragraph title = new Paragraph("Notes Export");
+        title.setAlignment(Paragraph.ALIGN_CENTER);
+        pdf.add(title);
+        pdf.add(new Paragraph("\n"));
+
+        // Table with 5 columns (ID, Title, Category, Content, Created At)
+        PdfPTable table = new PdfPTable(5);
+        table.setWidthPercentage(100);
+
+        // Header font
+        Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+        Font rowFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+
+        // Header cells
+        table.addCell(new PdfPCell(new Paragraph("ID", headerFont)));
+        table.addCell(new PdfPCell(new Paragraph("Title", headerFont)));
+        table.addCell(new PdfPCell(new Paragraph("Category", headerFont)));
+        table.addCell(new PdfPCell(new Paragraph("Content", headerFont)));
+        table.addCell(new PdfPCell(new Paragraph("Created At", headerFont)));
+
+        // Data rows
+        for (Note n : noteList) {
+            table.addCell(new PdfPCell(new Paragraph(String.valueOf(n.getId()), rowFont)));
+            table.addCell(new PdfPCell(new Paragraph(n.getTitle(), rowFont)));
+            
+            // === CATEGORY ===
+            String category = (n.getCategory() != null) ? n.getCategory().getName() : "-";
+            table.addCell(new PdfPCell(new Paragraph(category, rowFont)));
+
+            table.addCell(new PdfPCell(new Paragraph(n.getContent(), rowFont)));
+            table.addCell(new PdfPCell(new Paragraph(n.getCreatedAt().toString(), rowFont)));
+        }
+
+        pdf.add(table);
+        pdf.close();
+
+        JOptionPane.showMessageDialog(this, "Saved to: " + path);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Failed export!");
+    }
+}
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
+    }
+
+    private void loadNotesFromDatabase() {
+    NoteService noteService = new NoteService();
+    List<Note> notes = noteService.getAllNotes();
+
+    // kosongkan tabel 
+    tableModel.setRowCount(0);
+    noteList.clear();
+
+    // masukkan data ke tabel
+    for (Note n : notes) {
+    noteList.add(n);
+    tableModel.addRow(new Object[]{
+            n.getId(),
+            n.getTitle(),
+            n.getCategory(), 
+            n.getContent(),
+            n.getCreatedAt()
+        });
+    }
+}
+    public void showNotes(List<Note> notes) {
+    tableModel.setRowCount(0);
+    noteList.clear();
+
+    for (Note n : notes) {
+    noteList.add(n);
+    tableModel.addRow(new Object[]{
+            n.getId(),
+            n.getTitle(),
+            n.getCategory(), 
+            n.getContent(),
+            n.getCreatedAt()
+         });
+        }
     }
 }

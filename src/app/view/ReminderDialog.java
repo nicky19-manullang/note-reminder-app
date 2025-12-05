@@ -5,103 +5,92 @@
 package app.view;
 import javax.swing.*;
 import java.awt.*;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
 /**
  *
  * @author admin
  */
 public class ReminderDialog extends JDialog {
 
-    private JCheckBox enableReminderCheckBox;
+    private JTextField txtTitle;
+    private JTextArea txtMessage;
     private JSpinner dateSpinner;
-    private JSpinner timeSpinner;
     private boolean saved = false;
 
-    public ReminderDialog(Frame parent) {
+    public ReminderDialog(JFrame parent) {
         super(parent, "Set Reminder", true);
-        initComponents();
-        setupLayout();
-        setSize(350, 250);
+        setSize(400, 350);
         setLocationRelativeTo(parent);
+
+        initUI();
     }
 
-    private void initComponents() {
-        enableReminderCheckBox = new JCheckBox("Enable Reminder");
-
-        // Date Picker
-        dateSpinner = new JSpinner(new SpinnerDateModel());
-        JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "dd-MM-yyyy");
-        dateSpinner.setEditor(dateEditor);
-
-        // Time Picker
-        timeSpinner = new JSpinner(new SpinnerDateModel());
-        JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, "HH:mm");
-        timeSpinner.setEditor(timeEditor);
-    }
-
-    private void setupLayout() {
+    private void initUI() {
         setLayout(new BorderLayout());
 
-        JPanel formPanel = new JPanel(new GridLayout(3, 2, 10, 10));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // Panel input
+        JPanel formPanel = new JPanel(new GridLayout(3, 1, 10, 10));
 
-        formPanel.add(new JLabel("Enable Reminder:"));
-        formPanel.add(enableReminderCheckBox);
+        txtTitle = new JTextField();
 
-        formPanel.add(new JLabel("Date:"));
-        formPanel.add(dateSpinner);
+        txtMessage = new JTextArea(5, 20);
+        txtMessage.setLineWrap(true);
+        txtMessage.setWrapStyleWord(true);
 
-        formPanel.add(new JLabel("Time:"));
-        formPanel.add(timeSpinner);
+        dateSpinner = new JSpinner(
+                new SpinnerDateModel()
+        );
+        JSpinner.DateEditor editor = new JSpinner.DateEditor(dateSpinner, "yyyy-MM-dd HH:mm");
+        dateSpinner.setEditor(editor);
+
+        formPanel.add(labeled("Reminder Title", txtTitle));
+        formPanel.add(labeled("Message", new JScrollPane(txtMessage)));
+        formPanel.add(labeled("Date & Time", dateSpinner));
 
         add(formPanel, BorderLayout.CENTER);
 
-        // Buttons Panel
+        // Buttons
         JPanel buttonPanel = new JPanel();
-
         JButton btnSave = new JButton("Save");
-        btnSave.addActionListener(e -> {
-            saved = true;
-            setVisible(false);
-        });
-
         JButton btnCancel = new JButton("Cancel");
-        btnCancel.addActionListener(e -> {
-            saved = false;
-            setVisible(false);
-        });
 
         buttonPanel.add(btnSave);
         buttonPanel.add(btnCancel);
 
         add(buttonPanel, BorderLayout.SOUTH);
+
+        btnSave.addActionListener(e -> {
+            saved = true;
+            dispose();
+        });
+
+        btnCancel.addActionListener(e -> dispose());
     }
 
-    // === Public getters ===
+    private JPanel labeled(String text, Component c) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(new JLabel(text), BorderLayout.NORTH);
+        p.add(c, BorderLayout.CENTER);
+        return p;
+    }
+
     public boolean isSaved() {
         return saved;
     }
 
-    public boolean isReminderEnabled() {
-        return enableReminderCheckBox.isSelected();
+    public String getTitleText() {
+        return txtTitle.getText();
     }
 
-    public Date getReminderDateTime() {
-        Calendar calendar = Calendar.getInstance();
+    public String getMessageText() {
+        return txtMessage.getText();
+    }
 
-        Date date = (Date) dateSpinner.getValue();
-        Date time = (Date) timeSpinner.getValue();
-
-        calendar.setTime(date);
-
-        Calendar timeCal = Calendar.getInstance();
-        timeCal.setTime(time);
-
-        // gabungkan date + time
-        calendar.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
-        calendar.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
-
-        return calendar.getTime();
+    public LocalDateTime getDateTime() {
+        java.util.Date date = (java.util.Date) dateSpinner.getValue();
+        return LocalDateTime.ofInstant(
+                date.toInstant(),
+                java.time.ZoneId.systemDefault()
+        );
     }
 }

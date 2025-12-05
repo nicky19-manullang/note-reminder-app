@@ -12,17 +12,10 @@ import java.sql.Connection;
  */
 public class TestConnection {
     public static void main(String[] args) {
-
-        Connection conn = DatabaseManager.getConnection();
-
-        if (conn != null) {
-            System.out.println("Koneksi database BERHASIL!");
-        } else {
-            System.out.println("Koneksi database GAGAL!");
-            return;
+        try(Connection conn = DatabaseManager.getConnection()) {
+            System.out.println("Koneksi!");
+        } catch(Exception e) {
+            System.out.println("Gagal!");
         }
-
-        NoteDAO dao = new NoteDAO();
-        dao.createTable();
     }
 }

@@ -8,65 +8,52 @@ import java.time.LocalDateTime;
  *
  * @author admin
  */
-public class Note {
 
+public class Note {
     private int id;
     private String title;
     private String content;
     private LocalDateTime createdAt;
 
-    // Konstruktor kosong (wajib untuk Swing & DAO)
+    private int categoryId;
+    private Category category; // relasi ke Category object
+
     public Note() {}
 
-    // Konstruktor lengkap
-    public Note(int id, String title, String content, LocalDateTime createdAt) {
+    public Note(int id, String title, String content, LocalDateTime createdAt, int categoryId) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;
+        this.categoryId = categoryId;
     }
 
-    // Konstruktor tanpa ID (untuk insert)
-    public Note(String title, String content) {
-        this.title = title;
-        this.content = content;
+    // === GETTER SETTER ===
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public int getCategoryId() { return categoryId; }
+    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
+
+    // === CATEGORY OBJECT ===
+    public Category getCategory() {
+        return category;
     }
 
-    // Getter & Setter
-    public int getId() {
-        return id;
-    }
+    public void setCategory(Category category) {
+        this.category = category;
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public String toString() {
-        return title; // supaya tampil bagus di combo box atau list
+        if(category != null) {
+            this.categoryId = category.getId();
+        }
     }
 }

@@ -18,18 +18,11 @@ public class DatabaseManager {
 
     public static Connection getConnection() {
         try {
-            // Load driver MySQL
             Class.forName("com.mysql.cj.jdbc.Driver");
-
             return DriverManager.getConnection(URL, USER, PASS);
-
-        } catch (ClassNotFoundException e) {
-            System.out.println("Driver MySQL tidak ditemukan!");
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (SQLException e) {
-            System.out.println("Gagal koneksi ke database!");
-            e.printStackTrace();
+            throw new RuntimeException("Database connection failed!");
         }
-        return null;
     }
 }
