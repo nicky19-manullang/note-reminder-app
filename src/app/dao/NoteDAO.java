@@ -6,6 +6,7 @@ package app.dao;
 
 import app.model.Note;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -16,14 +17,13 @@ public class NoteDAO {
 
     public List<Note> getAll() {
         List<Note> list = new ArrayList<>();
-
         String sql = "SELECT * FROM notes ORDER BY created_at DESC";
 
-        try(Connection conn = DatabaseManager.getConnection();
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(sql)) {
+        try (Connection conn = DatabaseManager.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
 
-            while(rs.next()) {
+            while (rs.next()) {
                 Note n = new Note(
                         rs.getInt("id"),
                         rs.getString("title"),
@@ -41,16 +41,16 @@ public class NoteDAO {
     }
 
     public Note getById(int id) {
-        String sql = "SELECT * FROM notes WHERE id = ?";
         Note note = null;
+        String sql = "SELECT * FROM notes WHERE id = ?";
 
-        try(Connection conn = DatabaseManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
-            if(rs.next()) {
+            if (rs.next()) {
                 note = new Note(
                         rs.getInt("id"),
                         rs.getString("title"),
@@ -63,14 +63,15 @@ public class NoteDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return note;
     }
 
     public void insert(Note note) {
-        String sql = "INSERT INTO notes(title, content, created_at, category_id) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO notes (title, content, created_at, category_id) VALUES (?, ?, ?, ?)";
 
-        try(Connection conn = DatabaseManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, note.getTitle());
             ps.setString(2, note.getContent());
@@ -79,7 +80,13 @@ public class NoteDAO {
 
             ps.executeUpdate();
 
-        } catch(Exception e) {
+            // ambil id baru dari MySQL
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                note.setId(rs.getInt(1));
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -87,8 +94,8 @@ public class NoteDAO {
     public void update(Note note) {
         String sql = "UPDATE notes SET title = ?, content = ?, category_id = ? WHERE id = ?";
 
-        try(Connection conn = DatabaseManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, note.getTitle());
             ps.setString(2, note.getContent());
@@ -97,7 +104,7 @@ public class NoteDAO {
 
             ps.executeUpdate();
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -105,13 +112,13 @@ public class NoteDAO {
     public void delete(int id) {
         String sql = "DELETE FROM notes WHERE id = ?";
 
-        try(Connection conn = DatabaseManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ps.executeUpdate();
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

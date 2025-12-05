@@ -16,7 +16,7 @@ public class Note {
     private LocalDateTime createdAt;
 
     private int categoryId;
-    private Category category; // relasi ke Category object
+    private Category category;
 
     public Note() {}
 
@@ -28,7 +28,7 @@ public class Note {
         this.categoryId = categoryId;
     }
 
-    // === GETTER SETTER ===
+    // GETTER SETTER
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -44,15 +44,10 @@ public class Note {
     public int getCategoryId() { return categoryId; }
     public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
 
-    // === CATEGORY OBJECT ===
-    public Category getCategory() {
-        return category;
-    }
-
+    public Category getCategory() { return category; }
     public void setCategory(Category category) {
         this.category = category;
-
-        if(category != null) {
+        if (category != null) {
             this.categoryId = category.getId();
         }
     }
