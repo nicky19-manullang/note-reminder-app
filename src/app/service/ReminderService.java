@@ -13,21 +13,21 @@ import java.util.List;
  */
 public class ReminderService {
 
-    private ReminderDAO reminderDAO = new ReminderDAO();
+    private ReminderDAO dao = new ReminderDAO();
 
     public List<Reminder> getAll() {
-        return reminderDAO.getAll();
+        return dao.getAll();
     }
 
     public boolean insert(Reminder r) {
-        return reminderDAO.insert(r);
+        return dao.insert(r);
     }
 
     public boolean update(Reminder r) {
-        return reminderDAO.update(r);
+        return dao.update(r);
     }
 
     public boolean delete(int id) {
-        return reminderDAO.delete(id);
+        return dao.delete(id);
     }
 }

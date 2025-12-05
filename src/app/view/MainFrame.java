@@ -22,6 +22,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.logging.Logger;
+import app.model.Reminder;
+import app.service.ReminderService;
+import app.view.AboutDialog;
+
 
 /**
  *
@@ -32,6 +36,8 @@ public class MainFrame extends JFrame {
     private JTable tblNotes;
     private DefaultTableModel tableModel;
     private java.util.List<Note> noteList = new java.util.ArrayList<>();
+    private ReminderService reminderService = new ReminderService();
+
 
     public MainFrame() {
         setTitle("Note Reminder App");
@@ -199,22 +205,23 @@ private void openReminder() {
 
     if (!dialog.isSaved()) return;
 
-    LocalDateTime time = dialog.getDateTime();
-    int noteId = getSelectedNoteId(); // ambil ID note yang dipilih
+    int noteId = getSelectedNoteId();
+    if (noteId == -1) return;
 
     Reminder r = new Reminder();
     r.setNoteId(noteId);
-    r.setReminderTime(time);
-    r.setNotified(false);
+    r.setRemindAt(dialog.getDateTime());
+    r.setStatus("pending");
 
     boolean saved = reminderService.insert(r);
 
     if (saved) {
-        JOptionPane.showMessageDialog(this, "Reminder saved to database!");
+        JOptionPane.showMessageDialog(this, "Reminder berhasil disimpan!");
     } else {
-        JOptionPane.showMessageDialog(this, "Failed to save reminder.");
+        JOptionPane.showMessageDialog(this, "Gagal menyimpan reminder!");
     }
 }
+
 
     private void openAbout() {
         new AboutDialog(this).setVisible(true);
@@ -319,4 +326,13 @@ private void exportPDF() {
          });
         }
     }
+
+    private int getSelectedNoteId() {
+    int row = tblNotes.getSelectedRow();
+    if (row == -1) {
+        JOptionPane.showMessageDialog(this, "Pilih note dulu!");
+        return -1;
+    }
+    return (int) tableModel.getValueAt(row, 0); // kolom 0 = ID
+}
 }

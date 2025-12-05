@@ -4,7 +4,6 @@
  */
 package app.model;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 /**
@@ -12,26 +11,46 @@ import java.time.LocalDateTime;
  * @author admin
  */
 public class Reminder {
+
     private int id;
     private int noteId;
-    private LocalDateTime reminderTime;
-    private LocalDateTime createdAt;
-    private boolean notified;
+    private LocalDateTime remindAt;
+    private String status;
 
     public Reminder() {}
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Reminder(int id, int noteId, LocalDateTime remindAt, String status) {
+        this.id = id;
+        this.noteId = noteId;
+        this.remindAt = remindAt;
+        this.status = status;
+    }
 
-    public int getNoteId() { return noteId; }
-    public void setNoteId(int noteId) { this.noteId = noteId; }
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public LocalDateTime getReminderTime() { return reminderTime; }
-    public void setReminderTime(LocalDateTime reminderTime) { this.reminderTime = reminderTime; }
+    public int getNoteId() {
+        return noteId;
+    }
+    public void setNoteId(int noteId) {
+        this.noteId = noteId;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getRemindAt() {
+        return remindAt;
+    }
+    public void setRemindAt(LocalDateTime remindAt) {
+        this.remindAt = remindAt;
+    }
 
-    public boolean isNotified() { return notified; }
-    public void setNotified(boolean notified) { this.notified = notified; }
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
