@@ -4,8 +4,10 @@
  */
 package app.dao;
 
+import app.model.Category;
 import app.model.Note;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -14,30 +16,43 @@ import java.util.List;
  */
 public class NoteDAO {
 
-    public List<Note> getAll() {
-        List<Note> list = new ArrayList<>();
-        String sql = "SELECT * FROM notes ORDER BY created_at DESC";
+public List<Note> getAll() {
+    List<Note> notes = new ArrayList<>();
 
-        try (Connection conn = DatabaseManager.getConnection();
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+    String sql = "SELECT n.*, c.id AS cid, c.name AS cname " +
+                 "FROM notes n LEFT JOIN categories c " +
+                 "ON n.category_id = c.id ORDER BY n.id ASC";
 
-            while (rs.next()) {
-                Note n = new Note(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("content"),
-                        rs.getTimestamp("created_at").toLocalDateTime(),
-                        rs.getInt("category_id")
-                );
-                list.add(n);
-            }
+    try (Connection conn = DatabaseManager.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        while (rs.next()) {
+            Note note = new Note();
+            note.setId(rs.getInt("id"));
+            note.setTitle(rs.getString("title"));
+            note.setContent(rs.getString("content"));
+            note.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+            note.setCategoryId(rs.getInt("category_id"));
+
+            // category
+            Category category = new Category();
+            category.setId(rs.getInt("cid"));
+            category.setName(rs.getString("cname"));
+            note.setCategory(category);
+
+            notes.add(note);
         }
-        return list;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+
+    return notes;
+}
+
+
+
+
 
     public Note getById(int id) {
         Note note = null;
@@ -50,13 +65,30 @@ public class NoteDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+                Integer categoryId = rs.getInt("category_id");
+
+                // Load category dari DAO lain
+                Category category = null;
+                if (categoryId != null && categoryId > 0) {
+                    CategoryDAO categoryDAO = new CategoryDAO();
+                    category = categoryDAO.getById(categoryId);
+                }
+
+                Timestamp reminderTimestamp = rs.getTimestamp("reminder_time");
+                LocalDateTime reminderTime = (reminderTimestamp != null)
+                        ? reminderTimestamp.toLocalDateTime()
+                        : null;
+
                 note = new Note(
                         rs.getInt("id"),
                         rs.getString("title"),
                         rs.getString("content"),
                         rs.getTimestamp("created_at").toLocalDateTime(),
-                        rs.getInt("category_id")
+                        categoryId
                 );
+
+                note.setReminderTime(reminderTime);
+                note.setCategory(category);
             }
 
         } catch (Exception e) {
@@ -65,6 +97,7 @@ public class NoteDAO {
 
         return note;
     }
+
 
     // Return ID baru
     public int insert(Note note) {
@@ -94,6 +127,7 @@ public class NoteDAO {
         return -1; // gagal
     }
 
+
     // Return true jika update berhasil
     public boolean update(Note note) {
         String sql = "UPDATE notes SET title = ?, content = ?, category_id = ? WHERE id = ?";
@@ -114,6 +148,7 @@ public class NoteDAO {
 
         return false;
     }
+
 
     // Return true jika delete berhasil
     public boolean delete(int id) {

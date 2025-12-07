@@ -37,6 +37,11 @@ public class MainFrame extends JFrame {
     private DefaultTableModel tableModel;
     private java.util.List<Note> noteList = new java.util.ArrayList<>();
     private ReminderService reminderService = new ReminderService();
+    private void startReminderChecker() {
+    Timer timer = new Timer(60000, e -> checkReminder()); // cek setiap 1 menit
+    timer.start();
+}
+
 
 
     public MainFrame() {
@@ -46,6 +51,7 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         initUI();
+        startReminderChecker();
     }
 
     private void initUI() {
@@ -211,7 +217,7 @@ private void openReminder() {
     Reminder r = new Reminder();
     r.setNoteId(noteId);
     r.setRemindAt(dialog.getDateTime());
-    r.setStatus("pending");
+    r.setStatus("PENDING");
 
     boolean saved = reminderService.insert(r);
 
@@ -221,6 +227,39 @@ private void openReminder() {
         JOptionPane.showMessageDialog(this, "Gagal menyimpan reminder!");
     }
 }
+private void checkReminder() {
+    List<Reminder> list = reminderService.getAll();
+    LocalDateTime now = LocalDateTime.now()
+            .withSecond(0)
+            .withNano(0);
+
+    for (Reminder r : list) {
+        LocalDateTime reminderTime = r.getRemindAt()
+                .withSecond(0)
+                .withNano(0);
+
+        if ("PENDING".equalsIgnoreCase(r.getStatus())
+        && !reminderTime.isAfter(now)) {
+
+
+            // Ambil note berdasarkan id
+            NoteService ns = new NoteService();
+            Note note = ns.getById(r.getNoteId());
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    note.getContent(),
+                    "Reminder: " + note.getTitle(),
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+            // Update status jadi DONE agar tidak muncul lagi
+            r.setStatus("DONE");
+            reminderService.update(r);
+        }
+    }
+}
+
 
 
     private void openAbout() {
@@ -303,11 +342,11 @@ private void exportPDF() {
     for (Note n : notes) {
     noteList.add(n);
     tableModel.addRow(new Object[]{
-            n.getId(),
-            n.getTitle(),
-            n.getCategory(), 
-            n.getContent(),
-            n.getCreatedAt()
+        n.getId(),
+        n.getTitle(),
+        n.getCategory() != null ? n.getCategory().getName() : "-",
+        n.getContent(),
+        n.getCreatedAt()
         });
     }
 }
@@ -318,12 +357,12 @@ private void exportPDF() {
     for (Note n : notes) {
     noteList.add(n);
     tableModel.addRow(new Object[]{
-            n.getId(),
-            n.getTitle(),
-            n.getCategory(), 
-            n.getContent(),
-            n.getCreatedAt()
-         });
+        n.getId(),
+        n.getTitle(),
+        n.getCategory() != null ? n.getCategory().getName() : "-",
+        n.getContent(),
+        n.getCreatedAt()
+        });
         }
     }
 

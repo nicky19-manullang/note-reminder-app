@@ -126,35 +126,38 @@ public class NoteFormDialog extends JDialog {
     }
 
     private void saveNote() {
-        String title = txtTitle.getText().trim();
-        String content = txtContent.getText().trim();
+    String title = txtTitle.getText().trim();
+    String content = txtContent.getText().trim();
 
-        if (title.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Title tidak boleh kosong!");
-            return;
-        }
-
-        if (content.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Content tidak boleh kosong!");
-            return;
-        }
-
-        if (note == null) {
-            note = new Note();
-            note.setCreatedAt(LocalDateTime.now());
-        }
-
-        note.setTitle(title);
-        note.setContent(content);
-
-        Category selected = (Category) cbCategory.getSelectedItem();
-        if(selected != null){
-            note.setCategoryId(selected.getId());
-        }
-
-        saved = true;
-        dispose();
+    if (title.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Title tidak boleh kosong!");
+        return;
     }
+
+    if (content.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Content tidak boleh kosong!");
+        return;
+    }
+
+    if (note == null) {
+        note = new Note();
+        note.setCreatedAt(LocalDateTime.now());
+    }
+
+    note.setTitle(title);
+    note.setContent(content);
+
+    // Ambil category
+    Category selected = (Category) cbCategory.getSelectedItem();
+    if(selected != null){
+        note.setCategoryId(selected.getId());
+        note.setCategory(selected); // <-- Tambahkan ini
+    }
+
+    saved = true;
+    dispose();
+}
+
 
     public boolean isSaved() {
         return saved;

@@ -32,8 +32,15 @@ public class NoteService {
     public boolean deleteNote(int id) {
         return dao.delete(id);
     }
+    public Note getNoteById(int id) {
+    return dao.getById(id);
+}
 
     public void delete(int id) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public Note getById(int noteId) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
