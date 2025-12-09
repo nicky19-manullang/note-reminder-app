@@ -241,10 +241,8 @@ private void checkReminder() {
         if ("PENDING".equalsIgnoreCase(r.getStatus())
         && !reminderTime.isAfter(now)) {
 
-
-            // Ambil note berdasarkan id
             NoteService ns = new NoteService();
-            Note note = ns.getById(r.getNoteId());
+            Note note = ns.getNoteById(r.getNoteId());
 
             JOptionPane.showMessageDialog(
                     this,
@@ -253,12 +251,12 @@ private void checkReminder() {
                     JOptionPane.INFORMATION_MESSAGE
             );
 
-            // Update status jadi DONE agar tidak muncul lagi
             r.setStatus("DONE");
             reminderService.update(r);
         }
     }
 }
+
 
 
 
