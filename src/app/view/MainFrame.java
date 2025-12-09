@@ -226,6 +226,7 @@ private void openReminder() {
     }
 }
 private void checkReminder() {
+    // 1. Ambil data reminder terbaru
     List<Reminder> list = reminderService.getAll();
     LocalDateTime now = LocalDateTime.now(); 
 
@@ -235,19 +236,16 @@ private void checkReminder() {
             && !reminderTime.isAfter(now)) {
             r.setStatus("DONE");
             reminderService.update(r);
-            NoteService ns = new NoteService();
-            Note note = ns.getNoteById(r.getNoteId());
-            String judul = (note != null) ? note.getTitle() : "Catatan Terhapus";
-            String isi   = (note != null) ? note.getContent() : "Konten tidak ditemukan";
             SwingUtilities.invokeLater(() -> {
                 JOptionPane.showMessageDialog(
                         this,
-                        isi,                     
-                        "Reminder: " + judul,      
+                        "Ingat note atau schedule anda",  
+                        "Reminder",                      
                         JOptionPane.INFORMATION_MESSAGE
                 );
             });
-            System.out.println("Reminder muncul untuk ID: " + r.getId());
+            
+            System.out.println("Reminder statis muncul untuk ID: " + r.getId());
         }
     }
 }
