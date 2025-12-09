@@ -3,13 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/view/NoteFormDialog.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/view/AboutDialog.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/service/ReminderService.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/service/CategoryService.java</file>
             <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/service/NoteService.java</file>
             <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/view/MainFrame.java</file>
-            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/controller/MainController.java</file>
+            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/service/ReminderService.java</file>
+            <file>file:/C:/Users/admin/OneDrive/Dokumen/NetBeansProjects/note-reminder-app/src/app/dao/ReminderDAO.java</file>
         </group>
     </open-files>
 </project-private>
