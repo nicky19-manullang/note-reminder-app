@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package app.view;
+import javax.swing.*;
 import java.io.FileOutputStream;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import app.model.Note;
 import app.service.NoteService;
-import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDateTime;
@@ -38,11 +38,9 @@ public class MainFrame extends JFrame {
     private java.util.List<Note> noteList = new java.util.ArrayList<>();
     private ReminderService reminderService = new ReminderService();
     private void startReminderChecker() {
-    Timer timer = new Timer(60000, e -> checkReminder()); // cek setiap 1 menit
+    Timer timer = new Timer(1000, e -> checkReminder()); 
     timer.start();
 }
-
-
 
     public MainFrame() {
         setTitle("Note Reminder App");
@@ -229,36 +227,30 @@ private void openReminder() {
 }
 private void checkReminder() {
     List<Reminder> list = reminderService.getAll();
-    LocalDateTime now = LocalDateTime.now()
-            .withSecond(0)
-            .withNano(0);
+    LocalDateTime now = LocalDateTime.now(); 
 
     for (Reminder r : list) {
-        LocalDateTime reminderTime = r.getRemindAt()
-                .withSecond(0)
-                .withNano(0);
-
-        if ("PENDING".equalsIgnoreCase(r.getStatus())
-        && !reminderTime.isAfter(now)) {
-
-            NoteService ns = new NoteService();
-            Note note = ns.getNoteById(r.getNoteId());
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    note.getContent(),
-                    "Reminder: " + note.getTitle(),
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
+        LocalDateTime reminderTime = r.getRemindAt();
+        if ("PENDING".equalsIgnoreCase(r.getStatus()) 
+            && !reminderTime.isAfter(now)) {
             r.setStatus("DONE");
             reminderService.update(r);
+            NoteService ns = new NoteService();
+            Note note = ns.getNoteById(r.getNoteId());
+            String judul = (note != null) ? note.getTitle() : "Catatan Terhapus";
+            String isi   = (note != null) ? note.getContent() : "Konten tidak ditemukan";
+            SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(
+                        this,
+                        isi,                     
+                        "Reminder: " + judul,      
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            });
+            System.out.println("Reminder muncul untuk ID: " + r.getId());
         }
     }
 }
-
-
-
 
     private void openAbout() {
         new AboutDialog(this).setVisible(true);

@@ -49,12 +49,7 @@ public List<Note> getAll() {
 
     return notes;
 }
-
-
-
-
-
-    public Note getById(int id) {
+public Note getById(int id) {
         Note note = null;
         String sql = "SELECT * FROM notes WHERE id = ?";
 
@@ -65,34 +60,27 @@ public List<Note> getAll() {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                Integer categoryId = rs.getInt("category_id");
-
-                // Load category dari DAO lain
-                Category category = null;
-                if (categoryId != null && categoryId > 0) {
-                    CategoryDAO categoryDAO = new CategoryDAO();
-                    category = categoryDAO.getById(categoryId);
+                note = new Note();
+                note.setId(rs.getInt("id"));
+                note.setTitle(rs.getString("title"));
+                note.setContent(rs.getString("content"));
+                Timestamp ts = rs.getTimestamp("created_at");
+                if (ts != null) {
+                    note.setCreatedAt(ts.toLocalDateTime());
                 }
-
-                Timestamp reminderTimestamp = rs.getTimestamp("reminder_time");
-                LocalDateTime reminderTime = (reminderTimestamp != null)
-                        ? reminderTimestamp.toLocalDateTime()
-                        : null;
-
-                note = new Note(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("content"),
-                        rs.getTimestamp("created_at").toLocalDateTime(),
-                        categoryId
-                );
-
-                note.setReminderTime(reminderTime);
-                note.setCategory(category);
+                
+                int categoryId = rs.getInt("category_id");
+                note.setCategoryId(categoryId);
+                if (categoryId > 0) {
+                    CategoryDAO categoryDAO = new CategoryDAO();
+                    Category category = categoryDAO.getById(categoryId);
+                    note.setCategory(category);
+                }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Error di NoteDAO.getById: " + e.getMessage());
         }
 
         return note;

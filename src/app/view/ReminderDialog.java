@@ -29,7 +29,7 @@ public class ReminderDialog extends JDialog {
 
         // Date-time spinner
         dateSpinner = new JSpinner(new SpinnerDateModel());
-        JSpinner.DateEditor editor = new JSpinner.DateEditor(dateSpinner, "yyyy-MM-dd HH:mm");
+        JSpinner.DateEditor editor = new JSpinner.DateEditor(dateSpinner, "yyyy-MM-dd HH:mm:ss");
         dateSpinner.setEditor(editor);
 
         formPanel.add(labeled("Reminder Date & Time", dateSpinner));
