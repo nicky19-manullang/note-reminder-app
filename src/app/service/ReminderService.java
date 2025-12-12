@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class ReminderService {
 
-    private ReminderDAO dao = new ReminderDAO();
+    private final ReminderDAO dao = new ReminderDAO();
 
     public List<Reminder> getAll() {
         return dao.getAll();

@@ -37,6 +37,7 @@ public class MainFrame extends JFrame {
     private DefaultTableModel tableModel;
     private java.util.List<Note> noteList = new java.util.ArrayList<>();
     private ReminderService reminderService = new ReminderService();
+    
     private void startReminderChecker() {
     Timer timer = new Timer(1000, e -> checkReminder()); 
     timer.start();
@@ -54,7 +55,7 @@ public class MainFrame extends JFrame {
 
     private void initUI() {
         tableModel = new DefaultTableModel(
-                new Object[]{"ID", "Title", "Category", "Content", "Created At"}, 0
+            new Object[]{"ID", "Title", "Category", "Content", "Created At"}, 0
         );
         tblNotes = new JTable(tableModel);
         loadNotesFromDatabase();
