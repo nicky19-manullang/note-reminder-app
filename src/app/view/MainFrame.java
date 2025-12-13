@@ -131,7 +131,6 @@ public class MainFrame extends JFrame {
     }
 }
 
-
     private void openEditForm() {
     int row = tblNotes.getSelectedRow();
     if (row == -1) {
@@ -361,6 +360,6 @@ private void exportPDF() {
         JOptionPane.showMessageDialog(this, "Pilih note dulu!");
         return -1;
     }
-    return (int) tableModel.getValueAt(row, 0); // kolom 0 = ID
+    return (int) tableModel.getValueAt(row, 0); // 
 }
 }
